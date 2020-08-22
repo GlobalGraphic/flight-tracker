@@ -44,18 +44,19 @@ fetch(flight_api)
             .setLngLat(marker.geometry.coordinates)
             .addTo(map);
         })
+    })
 
-        if(navigator.geolocation){
-            navigator.geolocation.getCurrentPosition(position => {
-                lat = position.coords.latitude;
-                lon = position.coords.longitude;
-                map.setCenter([lon, lat]);
-                map.setZoom(8)
-            })
-        }
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(position => {
+            lat = position.coords.latitude;
+            lon = position.coords.longitude;
+            map.setCenter([lon, lat]);
+            map.setZoom(8)
+        })
+    }
 
-        var nav = new mapboxgl.NavigationControl();
-        map.addControl(nav, 'top-left');
+    var nav = new mapboxgl.NavigationControl();
+    map.addControl(nav, 'top-left');
 
-        map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+    map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
 });
