@@ -60,3 +60,12 @@ fetch(flight_api)
 
     map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
 });
+
+if(!('serviceWorker') in navigator){
+    console.log('Service worker not supported');
+}
+
+navigator.serviceWorker.register('/sw.js')
+.then(function(registration){
+    console.log('Service worker registered! Scope is:', registration.scope);
+})
