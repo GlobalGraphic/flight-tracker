@@ -10,53 +10,67 @@ var map = new mapboxgl.Map({
     center: [0,0]
 });
 
-// flights api fetch data
-const flight_api = 'https://opensky-network.org/api/states/all';
-fetch(flight_api)
-.then(response => {
-    return response.json();
-})
-.then(data => {
-    let data_array = data.states;
-    data_array.forEach((el,index) => {
-        var geojson = {
-            'type': 'FeatureCollection',
-            'features': [
-                {
-                    'type': 'Feature',
-                    'properties': {
-                    'iconSize': [40, 40]
-                    },
-                    'geometry': {
-                    'type': 'Point',
-                    'coordinates': [el[5],el[6]]
-                    }
-                }
-            ]
-        }
-        //custom marker
-        geojson.features.forEach(marker =>{
-            // create a DOM element for the marker
-            var plane_marker = document.createElement('div');
-            plane_marker.className = 'marker';
-
-            new mapboxgl.Marker(plane_marker)
-            .setLngLat(marker.geometry.coordinates)
-            .addTo(map);
-        })
+const flight_data = () => {
+    // flights api fetch data
+    const flight_api = 'https://opensky-network.org/api/states/all';
+    fetch(flight_api)
+    .then(response => {
+        return response.json();
     })
+    .then(data => {
+        setTimeout(() => {
+            // console.log(data);
+            console.log('refreshed data');
+            let data_array = data.states;
+            data_array.forEach((el,index) => {
+                var geojson = {
+                    'type': 'FeatureCollection',
+                    'features': [
+                        {
+                            'type': 'Feature',
+                            'properties': {
+                                'iconSize': [40, 40]
+                            },
+                            'geometry': {
+                                'type': 'Point',
+                                'coordinates': [el[5],el[6]]
+                            }
+                        }
+                    ]
+                }
+                //custom marker
+                geojson.features.forEach(marker =>{
+                    // create a DOM element for the marker
+                    var plane_marker = document.createElement('div');
+                    plane_marker.className = 'marker';
 
-    if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(position => {
-            lat = position.coords.latitude;
-            lon = position.coords.longitude;
-            map.setCenter([lon, lat]);
-            map.setZoom(8)
-        })
-    }
+                    new mapboxgl.Marker(plane_marker)
+                    .setLngLat(marker.geometry.coordinates)
+                    .addTo(map);
+                })
+            })
+        },5000)
+    });
+}
 
-    var nav = new mapboxgl.NavigationControl();
-    map.addControl(nav, 'top-left');
+setInterval(() => {
+    flight_data();
+    let marker = document.querySelectorAll('.marker');
+    marker.forEach(function(el,index){
+        el.remove();
+    });
+}, 5000);
 
-    map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
-});
+if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(position => {
+        lat = position.coords.latitude;
+        lon = position.coords.longitude;
+        map.setCenter([lon, lat]);
+        map.setZoom(8)
+    })
+}
+
+var nav = new mapboxgl.NavigationControl();
+map.addControl(nav, 'top-left');
+
+map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
