@@ -12,14 +12,15 @@ var map = new mapboxgl.Map({
 
 const flight_data = () => {
     // flights api fetch data
-    const flight_api = 'https://opensky-network.org/api/states/all';
-    fetch(flight_api)
+    var headers = new Headers();
+    headers.append('Authorization', 'Basic ' + btoa('codehysteria28' + ':' + 'MU2DdufZrHAL7uN'));
+    fetch('https://opensky-network.org/api/states/all',{headers: headers})
     .then(response => {
         return response.json();
     })
     .then(data => {
         setTimeout(() => {
-            // console.log(data);
+            console.log(data);
             console.log('refreshed data');
             let data_array = data.states;
             data_array.forEach((el,index) => {
@@ -38,6 +39,10 @@ const flight_data = () => {
                         }
                     ]
                 }
+                // create the popup
+                var popup = new mapboxgl.Popup({ offset: 25 }).setText(
+                'Construction on the Washington Monument began in 1848.'
+                );
                 //custom marker
                 geojson.features.forEach(marker =>{
                     // create a DOM element for the marker
@@ -46,6 +51,7 @@ const flight_data = () => {
 
                     new mapboxgl.Marker(plane_marker)
                     .setLngLat(marker.geometry.coordinates)
+                    .setPopup(popup) // sets a popup on this marker
                     .addTo(map);
                 })
             })
